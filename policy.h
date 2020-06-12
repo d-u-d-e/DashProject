@@ -8,25 +8,32 @@ class Stats;
 class Request;
 class Downloader;
 
-class Policy
-{
-private:
+
+class BasePolicy{
+protected:
     int m_current_down_quality = 0;
     Stats & m_stats;
     std::vector<Segment> & m_responses;
     Downloader & m_downloader;
 
-    void preFetch(int coding_level);
-
 public:
-    static const unsigned short k = 5;
-    Policy(Stats & s, std::vector<Segment> & responses, Downloader & d):
+    BasePolicy(Stats & s, std::vector<Segment> & responses, Downloader & d):
         m_stats(s), m_responses(responses), m_downloader(d){
-        preFetch(m_current_down_quality);
+
     }
+    virtual Request getRequest() = 0;
+};
 
-    Request getRequest();
-
+class Policy: public BasePolicy
+{
+public:
+    static const unsigned short DEFAULT_PREFETCH = 5;
+    const unsigned short k;
+    Policy(Stats & s, std::vector<Segment> & responses, Downloader & d, unsigned int k_param = DEFAULT_PREFETCH):
+        BasePolicy(s, responses, d), k(k_param){
+    }
+    Request getRequest() override;
+    float preFetch(int coding_level);
 };
 
 #endif // POLICY_H

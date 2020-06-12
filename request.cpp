@@ -1,19 +1,14 @@
 #include "request.h"
 #include "stats.h"
 
-extern float time_played;
+Downloader::Downloader(std::vector<unsigned int> & bitrates): B(bitrates){}
 
-Downloader::Downloader(std::vector<unsigned int> & bitrates): B(bitrates)
+float Downloader::get(Request & r, float at_time)
 {
-
-}
-
-float Downloader::get(Request & r)
-{
-    r.m_requested_at = time_played;
+    r.m_send_time = at_time;
     R.push_back(r);
     float down_time = (float) r.m_seg.m_size / B.at(m_number++);
-    r.m_arrived_at = r.m_requested_at + down_time;
+    r.m_received_time = r.m_send_time + down_time;
     return down_time;
 }
 

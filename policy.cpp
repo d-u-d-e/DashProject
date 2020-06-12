@@ -8,18 +8,18 @@ extern float buf_size;
 extern float segment_time;
 extern unsigned int no_segments;
 
-static_assert (Policy::k >= 1, "k must be an integer greater than 0");
-
-void Policy::preFetch(int coding_level)
+float Policy::preFetch(int coding_level)
 {
     float time = 0;
-    for(int i = 1; i <= k; i++){
+    for(unsigned int i = 1; i <= k; i++){
         Request r(Segment(i, coding_level), Request::new_segment);
-        time += m_downloader.get(r);
+        r.m_is_media_buffering = true;
+        time += m_downloader.get(r, time);
         m_responses.push_back(r.getSegment());
     }
     m_stats.setDelay(time, 1);
     buf_size += k * segment_time;
+    return time;
 }
 
 Request Policy::getRequest()
@@ -28,8 +28,11 @@ Request Policy::getRequest()
         m_current_down_quality = max(0, m_current_down_quality - 1);
     else
         m_current_down_quality = min(4, m_current_down_quality + 1);
-    if(m_responses.size() < vector<Segment>::size_type(no_segments))
-        return Request(Segment(m_responses.size() + 1, m_current_down_quality), Request::new_segment);
+    if(m_responses.size() < vector<Segment>::size_type(no_segments)){
+        Request r(Segment(m_responses.size() + 1, m_current_down_quality), Request::new_segment);
+        r.m_is_media_buffering = (buf_size == 0);
+        return r;
+    }
     else{
        throw exception();
     }

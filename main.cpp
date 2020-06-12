@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <math.h>
-
+#include <iomanip>
 
 #include "stats.h"
 #include "policy.h"
@@ -18,7 +18,6 @@ float buf_size = 0;
 float segment_time = 0.5;
 float time_played = 0;
 unsigned int no_segments;
-
 
 bool readFiles(){
     ifstream mpd("MPD.txt");
@@ -57,11 +56,13 @@ int main()
 
     float media_time = no_segments * segment_time;
 
+    float start_time = p.preFetch(0);
+
     while(time_played < media_time){
 
         try {
              Request r = p.getRequest();
-             float down_time = downloader.get(r);
+             float down_time = downloader.get(r, time_played + start_time);
 
              Segment received = r.getSegment();
 
@@ -96,4 +97,10 @@ int main()
     ofstream out;
     out.open("policy.txt");
 
+    for(Request & r: downloader.getRequests()){
+        Segment s = r.getSegment();
+        out << setprecision(6) << fixed; //microseconds
+        out << left << setw(12) << r.getSendTime() << setw(3) << r.m_is_media_buffering << setw(7) << s.m_number
+            <<  s.m_coding_level << endl;
+    }
 }
