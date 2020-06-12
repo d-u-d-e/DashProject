@@ -68,7 +68,7 @@ int main()
              if(buf_size < down_time){
                  float freeze = down_time - buf_size;
                  time_played += buf_size;
-                 s.updatePhi(freeze, time_played / segment_time + 1);
+                 s.setDelay(freeze, time_played / segment_time + 1);
                  buf_size = 0;
              }
              else{
@@ -85,9 +85,9 @@ int main()
              }
 
         } catch (exception e) { //policy has finished, so we can play the whole media
-            time_played += buf_size;
-            if(time_played < media_time)
-                cout << "ERROR" << endl;
+            s.setTimeLeft(buf_size);
+            time_played += buf_size + 0.1; //get rid of approx errors
+            buf_size = 0;
         }
     }
 

@@ -8,6 +8,8 @@ extern float buf_size;
 extern float segment_time;
 extern unsigned int no_segments;
 
+static_assert (Policy::k >= 1, "k must be an integer greater than 0");
+
 void Policy::preFetch(int coding_level)
 {
     float time = 0;
@@ -16,7 +18,7 @@ void Policy::preFetch(int coding_level)
         time += m_downloader.get(r);
         m_responses.push_back(r.getSegment());
     }
-    m_stats.updatePhi(time, 1);
+    m_stats.setDelay(time, 1);
     buf_size += k * segment_time;
 }
 
@@ -28,7 +30,8 @@ Request Policy::getRequest()
         m_current_down_quality = min(4, m_current_down_quality + 1);
     if(m_responses.size() < vector<Segment>::size_type(no_segments))
         return Request(Segment(m_responses.size() + 1, m_current_down_quality), Request::new_segment);
-    else
+    else{
        throw exception();
+    }
 }
 
