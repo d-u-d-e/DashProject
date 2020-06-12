@@ -12,11 +12,11 @@ float Downloader::get(Request & r)
 {
     r.m_requested_at = time_played;
     R.push_back(r);
-    float down_time = r.m_seg.m_size / B.at(number++);
+    float down_time = r.m_seg.m_size / B.at(m_number++);
     r.m_arrived_at = r.m_requested_at + down_time;
 
     return down_time;
 
 }
 
-int Downloader::number = 0;
+int Downloader::m_number = 0;

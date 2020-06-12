@@ -12,8 +12,8 @@ class Policy
 {
 
 private:
-    static unsigned short k;
-    int current_down_quality = 0;
+    static const unsigned short k = 10;
+    int m_current_down_quality = 0;
     Stats & m_stats;
     std::vector<Segment> & m_responses;
     Downloader & m_downloader;
@@ -24,7 +24,7 @@ public:
 
     Policy(Stats & s, std::vector<Segment> & responses, Downloader & d):
         m_stats(s), m_responses(responses), m_downloader(d){
-        preFetch(current_down_quality);
+        preFetch(m_current_down_quality);
     }
 
     Request getRequest();

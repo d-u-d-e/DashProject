@@ -23,13 +23,12 @@ void Policy::preFetch(int coding_level)
 Request Policy::getRequest()
 {
     if(buf_size < k * segment_time)
-        current_down_quality = max(0, current_down_quality - 1);
+        m_current_down_quality = max(0, m_current_down_quality - 1);
     else
-        current_down_quality = min(4, current_down_quality + 1);
+        m_current_down_quality = min(4, m_current_down_quality + 1);
     if(m_responses.size() < vector<Segment>::size_type(no_segments))
-        return Request(Segment(m_responses.size() + 1, current_down_quality), Request::new_segment);
+        return Request(Segment(m_responses.size() + 1, m_current_down_quality), Request::new_segment);
     else
        throw exception();
 }
 
-unsigned short Policy::k = 10;

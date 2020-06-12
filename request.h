@@ -25,7 +25,7 @@ private:
 
 class Downloader{
 private:
-    static int number;
+    static int m_number;
     std::vector<unsigned int> & B;
     std::vector<Request> R;
 public:

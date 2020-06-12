@@ -11,8 +11,8 @@ class Stats{
 private:
     std::vector<float> P;
     std::vector<float> U;
-    static float beta;
-    static float gamma;
+    static constexpr float beta = 0.5;
+    static constexpr float gamma = 0.5;
     std::vector<Segment> & m_responses;
     float m_total_freeze_time = 0.0;
     float m_loss_delay = 0.0;

@@ -4,10 +4,6 @@
 #include <iostream>
 #include <math.h>
 
-
-float Stats::beta = 0.5;
-float Stats::gamma = 0.5;
-
 extern unsigned int no_segments;
 extern float segment_time;
 
@@ -52,8 +48,8 @@ std::string Stats::toString()
     std::string s = "overall QoE: " + std::to_string(computeOverallQoE()) + "\n";
     s += "total freeze time: " + std::to_string(m_total_freeze_time) + " (sec)\n";
     s += "initial delay: " + std::to_string(P.at(0)) + " (sec)\n";
-    s += "loss delay: " + std::to_string(m_loss_delay) + "\n";
-    s += "loss quality change: " + std::to_string(m_loss_quality_change) + "\n";
-    s += "quality gain: " + std::to_string(m_gain_quality) + "\n";
+    s += "loss delay: (-) " + std::to_string(m_loss_delay) + "\n";
+    s += "loss quality change: (-) " + std::to_string(m_loss_quality_change) + "\n";
+    s += "quality gain: (+) " + std::to_string(m_gain_quality) + "\n\n";
     return s;
 }
