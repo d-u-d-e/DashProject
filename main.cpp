@@ -51,13 +51,13 @@ int main()
 
     vector<Segment> responses;
     Stats s(responses);
-    Downloader downloader(B);
-    Policy2 p(s, responses, downloader, 5);
+    Downloader downloader(s, B);
+    Policy3 p(s, responses, downloader, 30);
 
     double media_time = no_segments * segment_time;
 
     double current_time = 0.0;
-    current_time = p.preFetch(0, p.k);
+    current_time = p.preFetch(0, 10);
 
     while(time_played < media_time){
 
@@ -70,6 +70,8 @@ int main()
              if(buf_size < down_time){
                  double freeze = down_time - buf_size;
                  time_played += buf_size;
+                 cout << "delay before playing seg: " << round(time_played / segment_time) + 1 << " " << "for secs " << freeze << "; down_time: " <<
+                         down_time << ", buf_size: " << buf_size << endl;
                  //using round to prevent truncating because time_played is slightly affected by approx errors
                  s.setDelay(freeze, round(time_played / segment_time) + 1);
                  buf_size = 0;
@@ -96,10 +98,11 @@ int main()
         }
     }
 
-    cout << s.toString();
+    cout << endl << s.toString();
 
     ofstream out;
     out.open("policy.txt");
+
 
     for(Request & r: downloader.getRequests()){
         Segment s = r.getSegment();

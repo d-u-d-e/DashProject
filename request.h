@@ -5,6 +5,7 @@
 #include <vector>
 
 class Downloader;
+class Stats;
 class Request{
 
 friend Downloader;
@@ -30,10 +31,11 @@ private:
 class Downloader{
 private:
     static unsigned int m_number;
+    Stats & m_stats;
     std::vector<unsigned int> & B;
     std::vector<Request> R;
 public:
-    Downloader(std::vector<unsigned int> & bitrates);
+    Downloader(Stats & s, std::vector<unsigned int> & bitrates);
     double get(Request & r, double at_time);
     std::vector<Request> & getRequests(){return R;}
 };

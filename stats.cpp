@@ -56,12 +56,13 @@ string Stats::toString()
     s += "loss quality change: (-) " + to_string(m_loss_quality_change) + "\n";
     s += "quality gain: (+) " + to_string(m_gain_quality) + "\n";
     s += "time left to play after download: " + to_string(m_time_left) + " (sec)\n";
+    s += "average bitrate: " + to_string(m_average_bitrate) + " (kbit/s)\n";
 
     unsigned int sum = 0;
     for(Segment & seg: m_responses)
         sum += seg.m_coding_level;
 
-    s += "avarage coding level: " +to_string((double) sum / m_responses.size()) + "\n\n";
+    s += "average coding level: " +to_string((double) sum / m_responses.size()) + "\n\n";
 
     return s;
 }
@@ -69,4 +70,13 @@ string Stats::toString()
 void Stats::setTimeLeft(double time)
 {
     m_time_left = time;
+}
+
+double Stats::getNextDownloadTimeEstimation()
+{
+    //rough estimation based on size of latest response
+    if(m_responses.size() > 0)
+        return m_responses.back().m_size / m_current_bitrate;
+    else
+        throw exception();
 }

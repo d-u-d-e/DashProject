@@ -2,11 +2,14 @@
 #include "request.h"
 #include "stats.h"
 
+#include <math.h>
+
 using namespace std;
 
 extern double buf_size;
 extern double segment_time;
 extern unsigned int no_segments;
+extern double time_played;
 
 double BasePolicy::preFetch(unsigned short coding_level, unsigned int number)
 {
@@ -19,6 +22,7 @@ double BasePolicy::preFetch(unsigned short coding_level, unsigned int number)
     }
     m_stats.setDelay(time, 1);
     buf_size += number * segment_time;
+    m_current_coding_level = coding_level;
     return time;
 }
 
@@ -26,12 +30,14 @@ double BasePolicy::preFetch(unsigned short coding_level, unsigned int number)
 
 Request Policy1::getRequest()
 {
-    if(m_responses.size() < vector<Segment>::size_type(no_segments)){
-        Request r(Segment(m_responses.size() + 1, 3), Request::new_segment);
+    unsigned int next_segment = m_responses.size() + 1;
+
+    if(next_segment <= no_segments){ //more segments to download
+        Request r(Segment(next_segment, 3), Request::new_segment);
         r.m_is_media_buffering = (buf_size == 0);
         return r;
     }
-    else
+    else //all done
        throw exception();
 }
 
@@ -42,15 +48,17 @@ Request Policy1::getRequest()
 Request Policy2::getRequest()
 {
     if(buf_size < k * segment_time)
-        m_current_down_quality = max(0, m_current_down_quality - 1);
+        m_current_coding_level = min(4, m_current_coding_level + 1);
     else
-        m_current_down_quality = min(4, m_current_down_quality + 1);
-    if(m_responses.size() < vector<Segment>::size_type(no_segments)){
-        Request r(Segment(m_responses.size() + 1, m_current_down_quality), Request::new_segment);
+        m_current_coding_level = max(0, m_current_coding_level - 1);
+
+    unsigned int next_segment = m_responses.size() + 1;
+    if(next_segment <= no_segments){ //more segments to download
+        Request r(Segment(next_segment, m_current_coding_level), Request::new_segment);
         r.m_is_media_buffering = (buf_size == 0);
         return r;
     }
-    else
+    else //all done
        throw exception();
 }
 
@@ -58,9 +66,47 @@ Request Policy2::getRequest()
 
 //*************** POLICY 3 ***************
 
+
 Request Policy3::getRequest()
 {
+    unsigned int next_seg = m_responses.size() + 1;
+    if(next_seg <= no_segments){ //more segments to download
 
+        if(buf_size < k * segment_time)
+            m_current_coding_level = min(4, m_current_coding_level + 1);
+        else
+            m_current_coding_level = max(0, m_current_coding_level - 1);
+
+        Request r(Segment(next_seg, m_current_coding_level), Request::new_segment);
+        r.m_is_media_buffering = (buf_size == 0);
+        return r;
+    }
+    else{ //all segments downloaded
+
+        //rough estimation of next download time
+        double down_est = m_stats.getNextDownloadTimeEstimation();
+        unsigned int first_to_replace = (time_played + down_est) / segment_time + 2;
+        //just in case, we stay safe and go ahead 1 segment, but we don't have to worry if it takes much time,
+        //main.cpp checks if this segment is valid before playing it
+
+        //start from the end and replace (if we have time) each segment with the best quality
+        next_seg = m_responses.size();
+
+        while(next_seg >= first_to_replace && m_responses.at(next_seg - 1).m_coding_level == 0)
+            next_seg--;
+
+        if(next_seg >= first_to_replace){
+            Request r(Segment(next_seg, 0), Request::better_segment);
+            r.m_is_media_buffering = (buf_size == 0);
+            return r;
+        }
+        else{
+            //all done, no need to download new segments,
+            //either we don't have much time left to play (or download requires too much time)
+            //or all segments are already at highest quality
+            throw exception();
+        }
+    }
 }
 
 //*************** END POLICY 3 ***************

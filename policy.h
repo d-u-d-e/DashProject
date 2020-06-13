@@ -12,7 +12,7 @@ class Downloader;
 class BasePolicy{
 protected:
     static const unsigned short DEFAULT_PREFETCH = 5;
-    int m_current_down_quality = 0;
+    int m_current_coding_level = 4;
     Stats & m_stats;
     std::vector<Segment> & m_responses;
     Downloader & m_downloader;
@@ -46,6 +46,10 @@ public:
 
 
 class Policy3: public BasePolicy{
+
+private:
+    unsigned int searchSegmentToReplace(unsigned int from_seg);
+
 public:
     const unsigned short k;
     Policy3(Stats & s, std::vector<Segment> & responses, Downloader & d, unsigned short k_param):

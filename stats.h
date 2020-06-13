@@ -5,8 +5,11 @@
 #include <string>
 
 class Segment;
+class Downloader;
 
 class Stats{
+
+friend Downloader;
 
 private:
     std::vector<double> P;
@@ -20,6 +23,8 @@ private:
     double m_gain_quality = 0.0;
     double m_time_left = 0.0;
     unsigned int m_freezes = 0;
+    double m_average_bitrate = 0.0;
+    double m_current_bitrate = 0.0;
 
     double computeOverallQoE();
 
@@ -30,7 +35,9 @@ public:
     void setDelay(double delay_time, unsigned int segment_number);
     std::string toString();
     void setTimeLeft(double time);
-
+    double getAverageBitrate(){return m_average_bitrate;}
+    double getCurrentBitrate(){return m_current_bitrate;}
+    double getNextDownloadTimeEstimation();
 };
 
 
