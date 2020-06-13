@@ -8,21 +8,21 @@ extern double buf_size;
 extern double segment_time;
 extern unsigned int no_segments;
 
-//*************** POLICY 1 ***************
-
-double Policy1::preFetch(unsigned short coding_level)
+double BasePolicy::preFetch(unsigned short coding_level, unsigned int number)
 {
     double time = 0;
-    for(unsigned int i = 1; i <= k; i++){
+    for(unsigned int i = 1; i <= number; i++){
         Request r(Segment(i, coding_level), Request::new_segment);
         r.m_is_media_buffering = true;
         time += m_downloader.get(r, time);
         m_responses.push_back(r.getSegment());
     }
     m_stats.setDelay(time, 1);
-    buf_size += k * segment_time;
+    buf_size += number * segment_time;
     return time;
 }
+
+//*************** POLICY 1 ***************
 
 Request Policy1::getRequest()
 {
@@ -58,13 +58,13 @@ Request Policy2::getRequest()
 
 //*************** POLICY 3 ***************
 
+Request Policy3::getRequest()
+{
 
-
-
-
-
+}
 
 
 
 
 //*************** END POLICY 3 ***************
+

@@ -52,7 +52,7 @@ int main()
     vector<Segment> responses;
     Stats s(responses);
     Downloader downloader(B);
-    Policy2 p(responses, downloader);
+    Policy2 p(s, responses, downloader);
 
     double media_time = no_segments * segment_time;
 

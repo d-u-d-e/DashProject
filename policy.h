@@ -11,31 +11,30 @@ class Downloader;
 
 class BasePolicy{
 protected:
+    static const unsigned short DEFAULT_PREFETCH = 5;
     int m_current_down_quality = 0;
+    Stats & m_stats;
     std::vector<Segment> & m_responses;
     Downloader & m_downloader;
 
 public:
-    BasePolicy(std::vector<Segment> & responses, Downloader & d):
-        m_responses(responses), m_downloader(d){
+    BasePolicy(Stats & s, std::vector<Segment> & responses, Downloader & d):
+        m_stats(s), m_responses(responses), m_downloader(d){
 
     }
     virtual Request getRequest() = 0;
+    double preFetch(unsigned short coding_level, unsigned int number = DEFAULT_PREFETCH);
 };
 
 class Policy1: public BasePolicy
 {
-private:
-    Stats & m_stats;
-
 public:
-    static const unsigned short DEFAULT_PREFETCH = 5;
     const unsigned short k;
-    Policy1(Stats & s, std::vector<Segment> & responses, Downloader & d, unsigned short k_param = DEFAULT_PREFETCH):
-        BasePolicy(responses, d), m_stats(s), k(k_param){
+    Policy1(Stats & s, std::vector<Segment> & responses, Downloader & d, unsigned short k_param):
+        BasePolicy(s, responses, d), k(k_param){
+        preFetch(0, k);
     }
     Request getRequest() override;
-    double preFetch(unsigned short coding_level);
 };
 
 #endif // POLICY_H
@@ -43,6 +42,16 @@ public:
 class Policy2: public BasePolicy{
 
 public:
-    Policy2(std::vector<Segment> & responses, Downloader & d): BasePolicy(responses, d){}
+    Policy2(Stats & s, std::vector<Segment> & responses, Downloader & d): BasePolicy(s, responses, d){}
+    Request getRequest() override;
+};
+
+class Policy3: public BasePolicy{
+public:
+    const unsigned short k;
+    Policy3(Stats & s, std::vector<Segment> & responses, Downloader & d, unsigned short k_param):
+        BasePolicy(s, responses, d), k(k_param){
+        preFetch(0, k);
+    }
     Request getRequest() override;
 };
