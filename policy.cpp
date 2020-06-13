@@ -26,12 +26,8 @@ double BasePolicy::preFetch(unsigned short coding_level, unsigned int number)
 
 Request Policy1::getRequest()
 {
-    if(buf_size < k * segment_time)
-        m_current_down_quality = max(0, m_current_down_quality - 1);
-    else
-        m_current_down_quality = min(4, m_current_down_quality + 1);
     if(m_responses.size() < vector<Segment>::size_type(no_segments)){
-        Request r(Segment(m_responses.size() + 1, m_current_down_quality), Request::new_segment);
+        Request r(Segment(m_responses.size() + 1, 3), Request::new_segment);
         r.m_is_media_buffering = (buf_size == 0);
         return r;
     }
@@ -45,8 +41,12 @@ Request Policy1::getRequest()
 
 Request Policy2::getRequest()
 {
+    if(buf_size < k * segment_time)
+        m_current_down_quality = max(0, m_current_down_quality - 1);
+    else
+        m_current_down_quality = min(4, m_current_down_quality + 1);
     if(m_responses.size() < vector<Segment>::size_type(no_segments)){
-        Request r(Segment(m_responses.size() + 1, 3), Request::new_segment);
+        Request r(Segment(m_responses.size() + 1, m_current_down_quality), Request::new_segment);
         r.m_is_media_buffering = (buf_size == 0);
         return r;
     }
@@ -62,9 +62,6 @@ Request Policy3::getRequest()
 {
 
 }
-
-
-
 
 //*************** END POLICY 3 ***************
 

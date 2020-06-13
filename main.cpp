@@ -52,12 +52,12 @@ int main()
     vector<Segment> responses;
     Stats s(responses);
     Downloader downloader(B);
-    Policy2 p(s, responses, downloader);
+    Policy2 p(s, responses, downloader, 5);
 
     double media_time = no_segments * segment_time;
 
     double current_time = 0.0;
-    //current_time = p.preFetch(0);
+    current_time = p.preFetch(0, p.k);
 
     while(time_played < media_time){
 
