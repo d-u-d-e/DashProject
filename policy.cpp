@@ -4,13 +4,15 @@
 
 using namespace std;
 
-extern float buf_size;
-extern float segment_time;
+extern double buf_size;
+extern double segment_time;
 extern unsigned int no_segments;
 
-float Policy::preFetch(int coding_level)
+//*************** POLICY 1 ***************
+
+double Policy1::preFetch(unsigned short coding_level)
 {
-    float time = 0;
+    double time = 0;
     for(unsigned int i = 1; i <= k; i++){
         Request r(Segment(i, coding_level), Request::new_segment);
         r.m_is_media_buffering = true;
@@ -22,7 +24,7 @@ float Policy::preFetch(int coding_level)
     return time;
 }
 
-Request Policy::getRequest()
+Request Policy1::getRequest()
 {
     if(buf_size < k * segment_time)
         m_current_down_quality = max(0, m_current_down_quality - 1);
@@ -33,8 +35,36 @@ Request Policy::getRequest()
         r.m_is_media_buffering = (buf_size == 0);
         return r;
     }
-    else{
+    else
        throw exception();
-    }
 }
 
+//*************** END POLICY 1 ***************
+
+//*************** POLICY 2 ***************
+
+Request Policy2::getRequest()
+{
+    if(m_responses.size() < vector<Segment>::size_type(no_segments)){
+        Request r(Segment(m_responses.size() + 1, 3), Request::new_segment);
+        r.m_is_media_buffering = (buf_size == 0);
+        return r;
+    }
+    else
+       throw exception();
+}
+
+//*************** END POLICY 2 ***************
+
+//*************** POLICY 3 ***************
+
+
+
+
+
+
+
+
+
+
+//*************** END POLICY 3 ***************

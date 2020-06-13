@@ -3,13 +3,13 @@
 
 Downloader::Downloader(std::vector<unsigned int> & bitrates): B(bitrates){}
 
-float Downloader::get(Request & r, float at_time)
+double Downloader::get(Request & r, double at_time)
 {
     r.m_send_time = at_time;
     R.push_back(r);
-    float down_time = (float) r.m_seg.m_size / B.at(m_number++);
+    double down_time = (double) r.m_seg.m_size / B.at(m_number++);
     r.m_received_time = r.m_send_time + down_time;
     return down_time;
 }
 
-int Downloader::m_number = 0;
+unsigned int Downloader::m_number = 0;

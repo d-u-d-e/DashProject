@@ -10,7 +10,7 @@ public:
 
     unsigned int m_number;
     unsigned short m_coding_level;
-    float m_quality;
+    double m_quality;
     unsigned int m_size;
 };
 #endif // SEGMENT_H

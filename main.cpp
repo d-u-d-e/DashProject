@@ -11,12 +11,12 @@
 using namespace std;
 
 vector<unsigned int> M;
-vector<float> Q;
-static vector<unsigned int> B;
+vector<double> Q;
 
-float buf_size = 0;
-float segment_time = 0.5;
-float time_played = 0;
+static vector<unsigned int> B;
+double buf_size = 0;
+double segment_time = 0.5;
+double time_played = 0;
 unsigned int no_segments;
 
 bool readFiles(){
@@ -27,7 +27,7 @@ bool readFiles(){
         return false;
 
    int seg, size;
-   float quality;
+   double quality;
 
    while(mpd >> seg >> size >> quality){
         M.push_back(size);
@@ -52,30 +52,34 @@ int main()
     vector<Segment> responses;
     Stats s(responses);
     Downloader downloader(B);
-    Policy p(s, responses, downloader);
+    Policy2 p(responses, downloader);
 
-    float media_time = no_segments * segment_time;
+    double media_time = no_segments * segment_time;
 
-    float start_time = p.preFetch(0);
+    double current_time = 0.0;
+    //current_time = p.preFetch(0);
 
     while(time_played < media_time){
 
         try {
              Request r = p.getRequest();
-             float down_time = downloader.get(r, time_played + start_time);
+             double down_time = downloader.get(r, current_time);
 
              Segment received = r.getSegment();
 
              if(buf_size < down_time){
-                 float freeze = down_time - buf_size;
+                 double freeze = down_time - buf_size;
                  time_played += buf_size;
-                 s.setDelay(freeze, time_played / segment_time + 1);
+                 //using round to prevent truncating because time_played is slightly affected by approx errors
+                 s.setDelay(freeze, round(time_played / segment_time) + 1);
                  buf_size = 0;
              }
              else{
                  buf_size -= down_time;
                  time_played += down_time;
              }
+
+             current_time += down_time;
 
              if(r.getType() == Request::new_segment){ //policy decided for a segment which has been downloaded for the first time
                  buf_size += segment_time;
@@ -100,7 +104,7 @@ int main()
     for(Request & r: downloader.getRequests()){
         Segment s = r.getSegment();
         out << setprecision(6) << fixed; //microseconds
-        out << left << setw(12) << r.getSendTime() << setw(3) << r.m_is_media_buffering << setw(7) << s.m_number
+        out << left << setw(12) << r.getSendTime() << setw(3) << !r.m_is_media_buffering << setw(7) << s.m_number
             <<  s.m_coding_level << endl;
     }
 }

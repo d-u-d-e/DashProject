@@ -5,17 +5,17 @@
 #include <math.h>
 
 extern unsigned int no_segments;
-extern float segment_time;
+extern double segment_time;
 
 using namespace std;
 
 Stats::Stats(vector<Segment> & responses): m_responses(responses)
 {
-    P = vector<float>(no_segments, 0.0);
-    U = vector<float>(no_segments, 0.0);
+    P = vector<double>(no_segments, 0.0);
+    U = vector<double>(no_segments, 0.0);
 }
 
-void Stats::setDelay(float delay_time, int segment_number)
+void Stats::setDelay(double delay_time, unsigned int segment_number)
 {
     P.at(segment_number - 1) = delay_time;
     m_total_freeze_time += delay_time;
@@ -24,9 +24,9 @@ void Stats::setDelay(float delay_time, int segment_number)
 
 double Stats::computeOverallQoE()
 {
-    float loss_quality_change = 0.0;
-    float loss_delay = exp(GAMMA * P.at(0) / segment_time);
-    float gain_quality = m_responses.at(0).m_quality;
+    double loss_quality_change = 0.0;
+    double loss_delay = exp(GAMMA * P.at(0) / segment_time);
+    double gain_quality = m_responses.at(0).m_quality;
     U.at(0) = gain_quality - loss_delay;
     m_gain_quality += gain_quality;
     m_loss_delay += loss_delay;
@@ -41,7 +41,7 @@ double Stats::computeOverallQoE()
         m_gain_quality += gain_quality;
     }
     double qoe = 0;
-    for (float v: U)
+    for (double v: U)
         qoe += v;
     return qoe;
 }
@@ -57,16 +57,16 @@ string Stats::toString()
     s += "quality gain: (+) " + to_string(m_gain_quality) + "\n";
     s += "time left to play after download: " + to_string(m_time_left) + " (sec)\n";
 
-    int sum = 0;
+    unsigned int sum = 0;
     for(Segment & seg: m_responses)
         sum += seg.m_coding_level;
 
-    s += "avarage coding level: " +to_string((float) sum / m_responses.size()) + "\n\n";
+    s += "avarage coding level: " +to_string((double) sum / m_responses.size()) + "\n\n";
 
     return s;
 }
 
-void Stats::setTimeLeft(float time)
+void Stats::setTimeLeft(double time)
 {
     m_time_left = time;
 }

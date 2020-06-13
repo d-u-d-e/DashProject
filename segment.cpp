@@ -1,7 +1,7 @@
 #include "segment.h"
 #include <vector>
 
-extern std::vector<float> Q;
+extern std::vector<double> Q;
 extern std::vector<unsigned int> M;
 
 Segment::Segment(unsigned int number, unsigned short coding_level):
