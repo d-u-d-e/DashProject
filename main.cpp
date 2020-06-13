@@ -18,6 +18,7 @@ double buf_size = 0;
 double segment_time = 0.5;
 double time_played = 0;
 unsigned int no_segments;
+double current_time = 0.0;
 
 bool readFiles(){
     ifstream mpd("MPD.txt");
@@ -52,11 +53,11 @@ int main()
     vector<Segment> responses;
     Stats s(responses);
     Downloader downloader(s, B);
-    Policy3 p(s, responses, downloader, 30);
+    Policy3 p(s, responses, downloader, 40);
 
     double media_time = no_segments * segment_time;
 
-    double current_time = 0.0;
+
     current_time = p.preFetch(0, 10);
 
     while(time_played < media_time){

@@ -23,9 +23,9 @@ private:
     double m_gain_quality = 0.0;
     double m_time_left = 0.0;
     unsigned int m_freezes = 0;
-    double m_average_bitrate = 0.0;
-    double m_current_bitrate = 0.0;
-
+    double m_overall_avg_bitrate = 0.0;
+    double m_avg_bitrate = 0.0;
+    unsigned int m_current_bitrate = 0;
     double computeOverallQoE();
 
 public:
@@ -35,9 +35,9 @@ public:
     void setDelay(double delay_time, unsigned int segment_number);
     std::string toString();
     void setTimeLeft(double time);
-    double getAverageBitrate(){return m_average_bitrate;}
-    double getCurrentBitrate(){return m_current_bitrate;}
-    double getNextDownloadTimeEstimation();
+    double getOverallAverageBitrate(){return m_overall_avg_bitrate;}
+    double getAvgBitrate(){return m_avg_bitrate;}
+    unsigned int getCurrentBitrate(){return m_current_bitrate;}
 };
 
 

@@ -17,6 +17,7 @@ public:
     Segment & getSegment(){return m_seg;}
     RequestType getType(){return m_type;}
     double getSendTime(){return m_send_time;}
+    double getDownTime(){return m_received_time - m_send_time;}
 
     bool m_is_media_buffering;
 
@@ -25,7 +26,6 @@ private:
     Segment m_seg;
     double m_received_time = 0;
     double m_send_time = 0;
-
 };
 
 class Downloader{
@@ -38,6 +38,7 @@ public:
     Downloader(Stats & s, std::vector<unsigned int> & bitrates);
     double get(Request & r, double at_time);
     std::vector<Request> & getRequests(){return R;}
+    double estimateDownTime(unsigned int size);
 };
 
 #endif // REQUEST_H

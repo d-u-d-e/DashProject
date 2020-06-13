@@ -48,10 +48,8 @@ public:
 class Policy3: public BasePolicy{
 
 private:
-    unsigned int searchSegmentToReplace(unsigned int from_seg);
-
+    unsigned short k;
 public:
-    const unsigned short k;
     Policy3(Stats & s, std::vector<Segment> & responses, Downloader & d, unsigned short k_param):
         BasePolicy(s, responses, d), k(k_param){}
 
