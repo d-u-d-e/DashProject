@@ -5,6 +5,9 @@ MPD::MPD()
 
 }
 
+/*
+*   this function is called while building the mpd file
+*/
 void MPD::addSegmentMetaData(Segment s)
 {
     if(s.m_number > metadata.size())

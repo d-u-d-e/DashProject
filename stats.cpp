@@ -46,6 +46,10 @@ double Stats::computeOverallQoE()
     return qoe;
 }
 
+
+/*
+    @return: a string displaying useful information
+*/
 string Stats::toString()
 {
     string s = "overall QoE: " + to_string(computeOverallQoE()) + "\n";
@@ -68,6 +72,9 @@ string Stats::toString()
     return s;
 }
 
+/*
+    @param time: time left to play after download has completed
+*/
 void Stats::setTimeLeft(double time)
 {
     m_time_left = time;

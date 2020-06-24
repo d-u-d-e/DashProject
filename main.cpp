@@ -11,12 +11,15 @@
 
 using namespace std;
 
+//global variables
+
 double buf_size = 0;
 double segment_time = 0.5;
 double time_played = 0;
 unsigned int no_segments;
 double current_time = 0.0;
 
+//an array used to keep track of bitrates
 static vector<unsigned int> B;
 
 bool readFiles(MPD & m){
@@ -90,12 +93,12 @@ int main()
                  buf_size += segment_time;
                  responses.push_back(received);
              } //we already have this segment, but policy decided to download a new one with a better quality
-             else if(time_played <= received.m_number * segment_time){ //better quality segment and we can play it
-                 responses.at(received.m_number - 1) = received;
+             else if(time_played <= received.m_number * segment_time){ //we can play it
+                 responses.at(received.m_number - 1) = received; //so we update the corresponding response
              }
 
         } catch (BasePolicy::policy_done e) { //policy has finished, play the rest
-            time_played += buf_size + 0.1; //+0.1 to get rid of approx errors
+            time_played += buf_size + 0.1; //+ 0.1 to get rid of approx errors
             buf_size = 0;
         }
     }
@@ -104,8 +107,7 @@ int main()
 
     ofstream out;
     out.open("policy.txt");
-
-
+    //ouput is formatted in a readable manner
     for(Request & r: downloader.getRequests()){
         Segment s = r.getSegment();
         out << setprecision(6) << fixed; //microseconds

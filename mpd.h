@@ -6,6 +6,8 @@
 
 class MPD
 {
+    //the outer vector goes through each segment number
+    //the inner vector contains all the segments with the same number and different encodings
     std::vector<std::vector<Segment>> metadata;
 public:
     MPD();

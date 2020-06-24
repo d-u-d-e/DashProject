@@ -5,15 +5,14 @@
 #include <string>
 
 class Segment;
-class Downloader;
 
 class Stats{
 
-friend Downloader;
+friend class Downloader;
 
 private:
-    std::vector<double> P;
-    std::vector<double> U;
+    std::vector<double> P; //phi for each segment
+    std::vector<double> U; //qoe for each segment
     static constexpr double BETA = 0.5;
     static constexpr double GAMMA = 0.5;
     std::vector<Segment> & m_responses;

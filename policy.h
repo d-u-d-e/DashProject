@@ -11,6 +11,7 @@ class MPD;
 
 class BasePolicy{
 protected:
+    //default number of segments to prefetch
     static const unsigned short DEFAULT_PREFETCH = 5;
     unsigned short m_current_coding_level = 4;
     Stats & m_stats;
@@ -23,10 +24,9 @@ public:
         m_stats(s), m_responses(responses), m_downloader(d), m_mpd(mpd){
 
     }
-    virtual Request getRequest() = 0;
+    virtual Request getRequest() = 0; //virtual so that each policy overrides it
     double preFetch(unsigned short coding_level, unsigned int number = DEFAULT_PREFETCH);
-
-    class policy_done: public std::exception{
+    class policy_done: public std::exception{ //use to signal that getRequest() can't provide a new request
 
     };
 };
@@ -41,6 +41,7 @@ public:
 class Policy2: public BasePolicy
 {
 public:
+    //the same k as in the policy suggested by the professor
     const unsigned short k;
     Policy2(Stats & s, std::vector<Segment> & responses, Downloader & d, MPD & mpd, unsigned short k_param):
         BasePolicy(s, responses, d, mpd), k(k_param){}
@@ -50,14 +51,15 @@ public:
 #endif // POLICY_H
 
 
-class Policy3: public BasePolicy{
+class Policy3: public BasePolicy{ //this is my policy
 
 private:
+    //the same k as in the policy suggested by the professor, but this is not fixed, hence the name
     unsigned short dynamic_k;
+    //the initial value for k, chosen by the instantiator of this policy
     unsigned short init_k;
 public:
     Policy3(Stats & s, std::vector<Segment> & responses, Downloader & d, MPD & mpd, unsigned short k_param):
         BasePolicy(s, responses, d, mpd), init_k(k_param){dynamic_k = init_k;}
-
     Request getRequest() override;
 };

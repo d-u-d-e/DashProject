@@ -4,12 +4,14 @@
 #include "segment.h"
 #include <vector>
 
-class Downloader;
 class Stats;
+
 class Request{
 
-friend Downloader;
+friend class Downloader;
+
 public:
+    //two types of request: for a new segment never ever downloaded, or for a better segment (higher quality)
     enum RequestType{new_segment, better_segment};
 
     Request(Segment s, RequestType t):
@@ -30,16 +32,16 @@ private:
 
 class Downloader{
 private:
-    static unsigned int m_number;
+    static unsigned int m_number; //in order to advance to the next row of bitrates
     Stats & m_stats;
-    std::vector<unsigned int> B;
-    std::vector<Request> R;
+    std::vector<unsigned int> & B; //this holds the bitrates, as in channels.txt
+    std::vector<Request> R; //this holds the requests
 public:
     Downloader(Stats & s, std::vector<unsigned int> & bitrates);
     double get(Request & r, double at_time);
     std::vector<Request> & getRequests(){return R;}
     double estimateDownTime(unsigned int size);
-    void setBitrates(std::vector<unsigned int> & bitrates){B = bitrates;}
 };
+
 
 #endif // REQUEST_H
