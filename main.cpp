@@ -7,20 +7,17 @@
 #include "stats.h"
 #include "policy.h"
 #include "request.h"
+#include "mpd.h"
 
 using namespace std;
 
-vector<unsigned int> M;
-vector<double> Q;
-
-static vector<unsigned int> B;
 double buf_size = 0;
 double segment_time = 0.5;
 double time_played = 0;
 unsigned int no_segments;
 double current_time = 0.0;
 
-bool readFiles(){
+bool readFiles(Downloader & d, MPD & m){
     ifstream mpd("MPD.txt");
     ifstream channel("channel.txt");
 
@@ -29,36 +26,40 @@ bool readFiles(){
 
    int seg, size;
    double quality;
+   unsigned short coding_lev = 0;
+   unsigned int prev_seg = 1;
 
    while(mpd >> seg >> size >> quality){
-        M.push_back(size);
-        Q.push_back(quality);
+       if(seg != prev_seg) coding_lev = 0;
+        m.addSegmentMetaData(Segment(seg, coding_lev++, quality, size));
+        prev_seg = seg;
    }
 
    int bitrate;
    while(channel >> bitrate)
        B.push_back(abs(bitrate));
 
-   no_segments = M.size()/5;
+   d.setBitrates(B);
+   no_segments = m.size();
    return true;
 }
 
 int main()
 {
-    if(!readFiles()){
+    vector<Segment> responses;
+    Stats s(responses);
+    Downloader downloader(s, B);
+    MPD mpd;
+
+    if(!readFiles(downloader, mpd)){
         cout << "cannot open files, exit..." << endl;
         exit(1);
     }
 
-    vector<Segment> responses;
-    Stats s(responses);
-    Downloader downloader(s, B);
     Policy3 p(s, responses, downloader, 40);
 
     double media_time = no_segments * segment_time;
-
-
-    current_time = p.preFetch(0, 10);
+    current_time = p.preFetch(0, 5);
 
     while(time_played < media_time){
 

@@ -6,7 +6,7 @@ class Segment{
 public:
     Segment(){}
 
-    Segment(unsigned int number, unsigned short coding_level);
+    Segment(unsigned int number, unsigned short coding_level, double quality, unsigned int size);
 
     unsigned int m_number;
     unsigned short m_coding_level;

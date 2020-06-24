@@ -8,10 +8,12 @@ SOURCES += \
         policy.cpp \
         request.cpp \
         segment.cpp \
-        stats.cpp
+        stats.cpp \
+    mpd.cpp
 
 HEADERS += \
     policy.h \
     request.h \
     segment.h \
-    stats.h
+    stats.h \
+    mpd.h

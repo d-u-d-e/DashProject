@@ -26,6 +26,7 @@ private:
     double m_overall_avg_bitrate = 0.0;
     double m_avg_bitrate = 0.0;
     unsigned int m_current_bitrate = 0;
+    unsigned int m_previous_bitrate = 1;
     double computeOverallQoE();
 
 public:
@@ -38,6 +39,7 @@ public:
     double getOverallAverageBitrate(){return m_overall_avg_bitrate;}
     double getAvgBitrate(){return m_avg_bitrate;}
     unsigned int getCurrentBitrate(){return m_current_bitrate;}
+    unsigned int getPreviousBitrate(){return m_previous_bitrate;}
 };
 
 

@@ -74,18 +74,25 @@ Request Policy3::getRequest()
     unsigned int next_seg = m_responses.size() + 1;
     if(next_seg <= no_segments){ //more segments to download
 
-        double curr_b = m_stats.getCurrentBitrate();
-        double avg_b = m_stats.getAvgBitrate();
+        unsigned int current_seg = time_played / segment_time + 1;
 
-        double ratio = curr_b / avg_b;
+        unsigned int candidate = current_seg + 1;
 
-        if(ratio >= 2) k = max(10, k - 5);
-        else if(ratio <= 0.5) k = min(40, k + 5);
 
-        if(buf_size < k * segment_time)
-            m_current_coding_level = min(4, m_current_coding_level + 1);
-        else
-            m_current_coding_level = max(0, m_current_coding_level - 1);
+        while(m_responses.size() >= candidate){
+            if(m_responses.at(candidate - 1).m_coding_level > 0){
+            unsigned int size = m_responses.at(candidate - 1).m_size;
+            double down_est = m_downloader.estimateDownTime(size);
+            if((time_played + down_est) / segment_time + 2 <= candidate)
+        }
+
+        unsigned int size = m_responses.at(next_seg - 1).m_size;
+        //rough estimation of next download time
+
+
+        //just in case, we stay safe and go ahead 1 segment, but we don't have to worry if it takes much time,
+        //main.cpp checks if this segment is valid before playing it
+        unsigned int first_to_replace = (time_played + down_est) / segment_time + 2;
 
 
         Request r(Segment(next_seg, m_current_coding_level), Request::new_segment);

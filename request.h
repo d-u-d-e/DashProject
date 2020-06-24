@@ -32,13 +32,14 @@ class Downloader{
 private:
     static unsigned int m_number;
     Stats & m_stats;
-    std::vector<unsigned int> & B;
+    std::vector<unsigned int> B;
     std::vector<Request> R;
 public:
     Downloader(Stats & s, std::vector<unsigned int> & bitrates);
     double get(Request & r, double at_time);
     std::vector<Request> & getRequests(){return R;}
     double estimateDownTime(unsigned int size);
+    void setBitrates(std::vector<unsigned int> & bitrates){B = bitrates;}
 };
 
 #endif // REQUEST_H

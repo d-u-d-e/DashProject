@@ -32,7 +32,7 @@ double Downloader::get(Request & r, double at_time)
         sum_recent_bitrates += B.at(m_number - i);
     m_stats.m_avg_bitrate = sum_recent_bitrates / size;
 
-
+    m_stats.m_previous_bitrate = m_stats.m_current_bitrate;
     m_stats.m_current_bitrate = current_bitrate;
 
     return down_time;
@@ -40,7 +40,7 @@ double Downloader::get(Request & r, double at_time)
 
 double Downloader::estimateDownTime(unsigned int size)
 {
-    return size / m_stats.m_overall_avg_bitrate;
+    return size / m_stats.m_avg_bitrate;
 }
 
 unsigned int Downloader::m_number = 0;
