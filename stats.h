@@ -26,21 +26,18 @@ private:
     double m_overall_avg_bitrate = 0.0;
     double m_avg_bitrate = 0.0;
     unsigned int m_current_bitrate = 0;
-    unsigned int m_previous_bitrate = 1;
     unsigned int m_replacements = 0;
     double computeOverallQoE();
 
 public:
 
     Stats(std::vector<Segment> & responses);
-
     void setDelay(double delay_time, unsigned int segment_number);
     std::string toString();
     void setTimeLeft(double time);
     double getOverallAverageBitrate(){return m_overall_avg_bitrate;}
     double getAvgBitrate(){return m_avg_bitrate;}
     unsigned int getCurrentBitrate(){return m_current_bitrate;}
-    unsigned int getPreviousBitrate(){return m_previous_bitrate;}
     void replacement(){m_replacements++;}
 };
 
