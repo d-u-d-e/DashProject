@@ -17,14 +17,16 @@ double time_played = 0;
 unsigned int no_segments;
 double current_time = 0.0;
 
-bool readFiles(Downloader & d, MPD & m){
+static vector<unsigned int> B;
+
+bool readFiles(MPD & m){
     ifstream mpd("MPD.txt");
     ifstream channel("channel.txt");
 
     if(!mpd.is_open() || !channel.is_open())
         return false;
 
-   int seg, size;
+   unsigned int seg, size;
    double quality;
    unsigned short coding_lev = 0;
    unsigned int prev_seg = 1;
@@ -39,24 +41,22 @@ bool readFiles(Downloader & d, MPD & m){
    while(channel >> bitrate)
        B.push_back(abs(bitrate));
 
-   d.setBitrates(B);
    no_segments = m.size();
    return true;
 }
 
 int main()
 {
-    vector<Segment> responses;
-    Stats s(responses);
-    Downloader downloader(s, B);
     MPD mpd;
-
-    if(!readFiles(downloader, mpd)){
+    if(!readFiles(mpd)){
         cout << "cannot open files, exit..." << endl;
         exit(1);
     }
 
-    Policy3 p(s, responses, downloader, 40);
+    vector<Segment> responses;
+    Stats s(responses);
+    Downloader downloader(s, B);
+    Policy3 p(s, responses, downloader, mpd, 40);
 
     double media_time = no_segments * segment_time;
     current_time = p.preFetch(0, 5);
@@ -66,21 +66,22 @@ int main()
         try {
              Request r = p.getRequest();
              double down_time = downloader.get(r, current_time);
-
              Segment received = r.getSegment();
 
              if(buf_size < down_time){
                  double freeze = down_time - buf_size;
                  time_played += buf_size;
-                 cout << "delay before playing seg: " << round(time_played / segment_time) + 1 << " " << "for secs " << freeze << "; down_time: " <<
-                         down_time << ", buf_size: " << buf_size << endl;
-                 //using round to prevent truncating because time_played is slightly affected by approx errors
-                 s.setDelay(freeze, round(time_played / segment_time) + 1);
                  buf_size = 0;
+                 unsigned int seg = round(time_played / segment_time) + 1;
+                 if(seg <= no_segments){
+                     cout << "delay before playing seg: " << seg << ", " << "freeze time: " << freeze << endl;
+                     s.setDelay(freeze, round(time_played / segment_time) + 1);
+                 }
              }
              else{
                  buf_size -= down_time;
                  time_played += down_time;
+                 if(received.m_number == no_segments) s.setTimeLeft(buf_size);
              }
 
              current_time += down_time;
@@ -90,12 +91,11 @@ int main()
                  responses.push_back(received);
              } //we already have this segment, but policy decided to download a new one with a better quality
              else if(time_played <= received.m_number * segment_time){ //better quality segment and we can play it
-                responses.at(received.m_number - 1) = received;
+                 responses.at(received.m_number - 1) = received;
              }
 
-        } catch (exception e) { //policy has finished, so we can play the whole media
-            s.setTimeLeft(buf_size);
-            time_played += buf_size + 0.1; //get rid of approx errors
+        } catch (BasePolicy::policy_done e) { //policy has finished, play the rest
+            time_played += buf_size + 0.1; //+0.1 to get rid of approx errors
             buf_size = 0;
         }
     }

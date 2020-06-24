@@ -7,7 +7,6 @@ SOURCES += \
         main.cpp \
         policy.cpp \
         request.cpp \
-        segment.cpp \
         stats.cpp \
     mpd.cpp
 

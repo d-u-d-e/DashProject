@@ -57,6 +57,7 @@ string Stats::toString()
     s += "quality gain: (+) " + to_string(m_gain_quality) + "\n";
     s += "time left to play after download: " + to_string(m_time_left) + " (sec)\n";
     s += "average bitrate: " + to_string(m_overall_avg_bitrate) + " (kbit/s)\n";
+    s += "segments replaced: " + to_string(m_replacements) +  "\n";
 
     unsigned int sum = 0;
     for(Segment & seg: m_responses)
